@@ -1,0 +1,33 @@
+server:
+  requestLog:
+    appenders:
+      - type: console
+        layout:
+          type: access-json
+          responseHeaders:
+            - X-Request-Id
+          requestHeaders:
+            - User-Agent
+            - X-Request-Id
+
+database:
+  datasourceClassName: org.postgresql.ds.PGSimpleDataSource
+  properties:
+    databaseName: test_schema
+    serverName: localhost
+    portNumber: 5432
+  user: user
+  password: test
+  maxSize: 12
+
+jersey-client:
+  workQueueSize: 8
+#  connectionRequestTimeout: 20 s
+#  timeout: 20 s
+#  connectionTimeout: 20 s
+
+logging:
+  appenders:
+    - type: console
+      layout:
+        type: app-json
