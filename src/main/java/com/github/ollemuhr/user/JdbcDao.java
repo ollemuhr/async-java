@@ -10,12 +10,10 @@ import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
-import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 @RegisterRowMapper(Mapper.class)
 public interface JdbcDao {
 
-  @Transaction
   @SqlQuery(
       "INSERT INTO users(username, firstname, lastname, email, supervisor_id) values(:username,:firstName,:lastName,:email,:supervisorId) RETURNING *;")
   Optional<UserEntity> insert(@BindBean UserEntity user);

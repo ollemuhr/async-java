@@ -9,16 +9,16 @@ import io.dropwizard.logging.json.EventAttribute;
 import io.dropwizard.logging.json.layout.EventJsonLayout;
 import io.dropwizard.logging.json.layout.JsonFormatter;
 import io.dropwizard.logging.json.layout.TimestampFormatter;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class AppEventJsonEvent extends EventJsonLayout {
+class AppEventJsonLayout extends EventJsonLayout {
 
   private static final ObjectMapper objectMapper = Jackson.newObjectMapper();
 
-  public AppEventJsonEvent(
+  AppEventJsonLayout(
       final JsonFormatter jsonFormatter,
       final TimestampFormatter timestampFormatter,
       final ThrowableHandlingConverter throwableProxyConverter,
@@ -41,11 +41,13 @@ public class AppEventJsonEvent extends EventJsonLayout {
   @Override
   protected Map<String, Object> toJsonMap(final ILoggingEvent event) {
     final Map<String, Object> map = super.toJsonMap(event);
-    Stream.of(event.getArgumentArray())
-        .filter(o -> (o instanceof Event))
-        .findFirst()
-        .map(o -> (Event) o)
-        .ifPresent(e -> map.put(e.getType(), toMap(e)));
+    if (event.getArgumentArray() != null) {
+      Stream.of(event.getArgumentArray())
+          .filter(o -> (o instanceof Event))
+          .findFirst()
+          .map(o -> (Event) o)
+          .ifPresent(e -> map.put(e.getType(), toMap(e)));
+    }
     return map;
   }
 
@@ -53,7 +55,9 @@ public class AppEventJsonEvent extends EventJsonLayout {
     try {
       return objectMapper.convertValue(e.getObject(), new TypeReference<Map<String, Object>>() {});
     } catch (final RuntimeException ex) {
-      return Collections.emptyMap();
+      var m = new HashMap<String, Object>();
+      m.put("error", ex.getMessage());
+      return m;
     }
   }
 }

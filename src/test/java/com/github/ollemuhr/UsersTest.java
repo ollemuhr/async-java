@@ -50,7 +50,7 @@ class UsersTest {
     var timeout = io.dropwizard.util.Duration.seconds(10);
     var jerseyClientConfiguration = new JerseyClientConfiguration();
 
-    jerseyClientConfiguration.setWorkQueueSize(10 * 1024);
+    jerseyClientConfiguration.setWorkQueueSize(1024);
     jerseyClientConfiguration.setMaxThreads(Runtime.getRuntime().availableProcessors() + 1);
     jerseyClientConfiguration.setTimeout(timeout);
     jerseyClientConfiguration.setConnectionRequestTimeout(timeout);
@@ -69,37 +69,43 @@ class UsersTest {
     client.close();
   }
 
-  @Test
-  void xinmem() throws CheckedFutureException {
-    doIt("inmem");
-  }
+//  @Test
+//  void xinmem() throws CheckedFutureException {
+//    doIt("inmem");
+//  }
 
-  @Test
-  void yinmem() throws CheckedFutureException {
-    doIt("inmem");
-  }
-
-  static Marker EVENT_MARKER = MarkerFactory.getMarker("EVENT");
+//  @Test
+//  void yinmem() throws CheckedFutureException {
+//    doIt("inmem");
+//  }
 
   @Test
   void ndbc() throws CheckedFutureException, JsonProcessingException {
     doIt("ndbc");
   }
 
-  @Test
-  void zinmem() throws CheckedFutureException {
-    doIt("inmem");
-  }
+//  @Test
+//  void zinmem() throws CheckedFutureException {
+//    doIt("inmem");
+//  }
 
   @Test
   void jdbc() throws CheckedFutureException {
     doIt("jdbc");
   }
 
+  //  @Test
+  //  void validation() throws CheckedFutureException {
+  //    Response response = post(user(1, ""), "ndbc")
+  //        .get(Duration.ofSeconds(1));
+  ////    System.out.println(response.getStatus());
+  ////    System.out.println(response.readEntity(String.class));
+  //  }
+
   private void doIt(final String path) throws CheckedFutureException {
     var timeout = Duration.ofSeconds(10);
     post(user(0, path), path).get(timeout);
-    var n = 100;
+    var n = 1000;
     var start = System.currentTimeMillis();
     var posted =
         IntStream.range(1, n).mapToObj(i -> post(user(i, path), path)).collect(Collectors.toList());
@@ -107,7 +113,7 @@ class UsersTest {
     var responses = Future.collect(posted).get(timeout);
 
     responses.forEach(r -> Assert.assertEquals(201, r.getStatus()));
-    responses.forEach(r -> System.out.println(r.getHeaderString("X-Request-Id")));
+
     final var users =
         IntStream.range(0, n).mapToObj(i -> get(i, path)).collect(Collectors.toList());
 

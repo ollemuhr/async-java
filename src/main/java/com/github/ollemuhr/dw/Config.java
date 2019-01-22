@@ -31,17 +31,15 @@ public class Config extends Configuration {
     final var config =
         io.trane.ndbc.Config.create(
                 "io.trane.ndbc.postgres.netty4.DataSourceSupplier", "localhost", 0, "user")
-            .database("test_schema")
-            .password("test")
-            .port(5432)
+            .database(database.getProperties().get("databaseName"))
+            .password(database.getPassword())
+            .port(Integer.valueOf(database.getProperties().get("portNumber")))
             .poolMaxSize(1)
             .embedded("io.trane.ndbc.postgres.embedded.EmbeddedSupplier");
 
-    // Create a DataSource
+    System.out.println("-------" + config.nioThreads());
     final var ds = DataSource.fromConfig(config);
-    // Define a timeout
     final var timeout = Duration.ofSeconds(1);
-
     try {
       ds.execute(
               "CREATE TABLE users(\n"

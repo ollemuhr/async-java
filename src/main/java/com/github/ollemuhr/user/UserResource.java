@@ -1,7 +1,7 @@
 package com.github.ollemuhr.user;
 
-import com.github.ollemuhr.log.Event;
 import com.github.ollemuhr.log.EventLogger;
+import com.github.ollemuhr.log.EventType;
 import io.trane.future.Future;
 import io.trane.ndbc.DataSource;
 import io.trane.ndbc.PreparedStatement;
@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
+import org.slf4j.MDC;
 
 @Path("users")
 public class UserResource {
@@ -67,7 +68,7 @@ public class UserResource {
   @Path("jdbc")
   @POST
   public Response jdbcAdd(final User user) {
-    return response(userDao.insert(UserEntity.valid(user)));
+    return created(userDao.insert(UserEntity.valid(user)));
   }
 
   @Path("ndbc")
@@ -75,10 +76,9 @@ public class UserResource {
   public void ndbcAdd(@Suspended final AsyncResponse asyncResponse, final User user) {
     asyncResponse.setTimeout(10, TimeUnit.SECONDS);
     NdbcDao.insertUser(dataSource, UserEntity.valid(user))
-        .map(UserResource::response)
+        .map(UserResource::created)
         .onFailure(asyncResponse::resume)
-        .onSuccess(asyncResponse::resume)
-        .ensure(() -> EventLogger.log(new Event("user", user)));
+        .onSuccess(asyncResponse::resume);
   }
 
   private static Response ok(final Optional<UserEntity> user) {
@@ -87,15 +87,16 @@ public class UserResource {
         .orElseGet(() -> Response.status(Status.NOT_FOUND).build());
   }
 
-  private static Response response(final Optional<UserEntity> u) {
+  private static Response created(final Optional<UserEntity> u) {
     return u.map(User::new)
-        .map(UserResource::created)
+        .map(
+            user -> {
+              EventLogger.log(EventType.USER_ADDED, user);
+              return user;
+            })
+        .map(user -> Response.created(location(user).build()))
         .map(ResponseBuilder::build)
         .orElseGet(() -> Response.serverError().build());
-  }
-
-  private static ResponseBuilder created(final User u) {
-    return Response.created(location(u).build());
   }
 
   private static UriBuilder location(final User u) {

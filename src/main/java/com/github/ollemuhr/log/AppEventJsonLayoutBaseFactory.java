@@ -13,7 +13,7 @@ public class AppEventJsonLayoutBaseFactory extends EventJsonLayoutBaseFactory {
   @Override
   public LayoutBase<ILoggingEvent> build(final LoggerContext context, final TimeZone timeZone) {
     final EventJsonLayout jsonLayout =
-        new AppEventJsonEvent(
+        new AppEventJsonLayout(
             createDropwizardJsonFormatter(),
             createTimestampFormatter(timeZone),
             createThrowableProxyConverter(),

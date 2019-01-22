@@ -5,16 +5,16 @@ public class Event {
   private final String type;
   private final Object object;
 
-  public Event(String type, Object object) {
+  Event(String type, Object object) {
     this.type = type;
     this.object = object;
   }
 
-  public String getType() {
+  String getType() {
     return type;
   }
 
-  public Object getObject() {
+  Object getObject() {
     return object;
   }
 }
