@@ -12,13 +12,20 @@ import io.trane.future.CheckedFutureException;
 import io.trane.future.Future;
 import io.trane.future.Promise;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import org.glassfish.jersey.client.rx.RxClient;
 import org.glassfish.jersey.client.rx.RxWebTarget;
 import org.glassfish.jersey.client.rx.java8.RxCompletionStageInvoker;
@@ -31,8 +38,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @ExtendWith({DropwizardExtensionsSupport.class})
@@ -69,41 +74,14 @@ class UsersTest {
     client.close();
   }
 
-//  @Test
-//  void xinmem() throws CheckedFutureException {
-//    doIt("inmem");
-//  }
-
-//  @Test
-//  void yinmem() throws CheckedFutureException {
-//    doIt("inmem");
-//  }
 
   @Test
   void ndbc() throws CheckedFutureException, JsonProcessingException {
     doIt("ndbc");
   }
 
-//  @Test
-//  void zinmem() throws CheckedFutureException {
-//    doIt("inmem");
-//  }
-
-  @Test
-  void jdbc() throws CheckedFutureException {
-    doIt("jdbc");
-  }
-
-  //  @Test
-  //  void validation() throws CheckedFutureException {
-  //    Response response = post(user(1, ""), "ndbc")
-  //        .get(Duration.ofSeconds(1));
-  ////    System.out.println(response.getStatus());
-  ////    System.out.println(response.readEntity(String.class));
-  //  }
-
   private void doIt(final String path) throws CheckedFutureException {
-    var timeout = Duration.ofSeconds(10);
+    var timeout = Duration.ofSeconds(30);
     post(user(0, path), path).get(timeout);
     var n = 1000;
     var start = System.currentTimeMillis();

@@ -1,7 +1,5 @@
 package com.github.ollemuhr.user;
 
-import com.github.ollemuhr.log.EventLogger;
-import com.github.ollemuhr.log.EventType;
 import io.trane.future.Future;
 import io.trane.ndbc.DataSource;
 import io.trane.ndbc.PreparedStatement;
@@ -21,7 +19,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
-import org.slf4j.MDC;
 
 @Path("users")
 public class UserResource {
@@ -89,11 +86,11 @@ public class UserResource {
 
   private static Response created(final Optional<UserEntity> u) {
     return u.map(User::new)
-        .map(
-            user -> {
-              EventLogger.log(EventType.USER_ADDED, user);
-              return user;
-            })
+        //        .map(
+        //            user -> {
+        //              EventLogger.log(EventType.USER_ADDED, user);
+        //              return user;
+        //            })
         .map(user -> Response.created(location(user).build()))
         .map(ResponseBuilder::build)
         .orElseGet(() -> Response.serverError().build());

@@ -37,7 +37,6 @@ public class Config extends Configuration {
             .poolMaxSize(1)
             .embedded("io.trane.ndbc.postgres.embedded.EmbeddedSupplier");
 
-    System.out.println("-------" + config.nioThreads());
     final var ds = DataSource.fromConfig(config);
     final var timeout = Duration.ofSeconds(1);
     try {
